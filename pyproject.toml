@@ -9,6 +9,13 @@ authors = [{ name = "smurri" }]
 keywords = ["llm", "agent", "evaluation", "scoring", "tool-use"]
 dependencies = []  # zero runtime dependencies by constraint
 
+# Optional layers for the demo/UI only — the core library stays dependency-free.
+[project.optional-dependencies]
+ui = ["streamlit>=1.30", "pandas>=2.0"]
+
+[project.scripts]
+agent-eval-demo = "agent_eval.demo:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

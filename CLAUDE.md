@@ -28,8 +28,17 @@ DB, no persistence — all state in memory.
 - `src/agent_eval/store.py`       — in-memory reference store (thread-safe).
 - `src/agent_eval/engine.py`      — `EvalEngine` facade (the public entry point).
 - `src/agent_eval/errors.py`      — typed exception hierarchy.
-- `tests/`                        — unit, boundary, adversarial, property-based.
+- `src/agent_eval/mockdata/`      — DEMO ONLY: seed data + mock SQL (sqlite) & NoSQL backends.
+- `src/agent_eval/demo.py`        — DEMO ONLY: headless CLI (`python -m agent_eval.demo`).
+- `ui/app.py`                     — DEMO ONLY: Streamlit UI (`uv run streamlit run ui/app.py`).
+- `tests/`                        — unit, boundary, adversarial, property-based, mockdata, UI smoke.
 - `docs/spec.md`, `docs/design.md`, `docs/adr/` — frozen artifacts.
+
+## Layering (don't violate)
+- `models / comparators / aggregation / results / store / engine / errors` = the **pure core**
+  (stdlib only, in-memory). The core NEVER imports `mockdata`, `demo`, or `ui`.
+- `mockdata` may use stdlib `sqlite3`/`json`; the UI uses the optional `ui` extra (streamlit).
+- Commands: `uv sync --extra ui` for the UI; `uv run streamlit run ui/app.py`.
 
 ## Conventions
 - Public API: small functions, full type hints, docstrings. Value objects are **frozen**.

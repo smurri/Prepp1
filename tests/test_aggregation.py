@@ -15,6 +15,7 @@ def test_mean_averages():
 
 def test_topk_mean_uses_top_k():
     agg = TopKMean(2)
+    
     assert agg([0.1, 0.9, 0.8, 0.2]) == pytest.approx((0.9 + 0.8) / 2)
     assert agg.name == "top2_mean"
 

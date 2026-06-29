@@ -48,5 +48,6 @@ The default failure mode of AI-assisted development is **accepting the first out
 ### Human-owns-irreversibility
 You execute or approve anything that can't be cheaply undone: merges to main, force-pushes, history-rewriting rebases, deletions, dropping data, deploys, releases, publishing packages, schema changes and migrations, anything touching secrets/credentials/money, and changes to access control, CI, or production settings. **Confidence is not authorization.** Never run irreversible work in auto-accept or YOLO.
 
+
 ### Other useful tools
 `/clear` (fresh context between phases) · `/compact` (summarize mid-phase) · `/permissions` (pre-allow/deny commands) · subdirectory `CLAUDE.md` files (per-area conventions in a monorepo).

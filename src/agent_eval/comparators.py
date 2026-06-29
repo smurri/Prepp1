@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from typing import Protocol, runtime_checkable
 
-from .models import Step, Trace
+from .models import Step, Trace, to_hashable
 
 # --- step-level similarity -------------------------------------------------
 
@@ -19,7 +19,9 @@ StepSimilarity = Callable[[Step, Step], float]
 
 
 def _clamp(x: float) -> float:
-    """Clamp to [0,1] to absorb floating-point drift."""
+    """Clamp to [0,1], absorbing floating-point drift and NaN (NaN -> 0.0)."""
+    if x != x:  # NaN
+        return 0.0
     if x < 0.0:
         return 0.0
     if x > 1.0:
@@ -44,8 +46,9 @@ def tool_and_args(tool_weight: float = 0.5):
 
     def _sim(a: Step, b: Step) -> float:
         tool = 1.0 if a.tool == b.tool else 0.0
-        ka = set(a.args.items())
-        kb = set(b.args.items())
+        # to_hashable() makes this robust to nested/unhashable arg values (F1).
+        ka = set(to_hashable(a.args))
+        kb = set(to_hashable(b.args))
         if not ka and not kb:
             args = 1.0
         else:

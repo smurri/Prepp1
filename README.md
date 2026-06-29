@@ -92,6 +92,34 @@ engine.clear(question_id=None) -> None
 - Under `MAX`, adding a reference never lowers the score.
 - The reference store is thread-safe; `score()` never mutates stored data.
 
+## Demo & UI (optional layers)
+
+The core library is in-memory and dependency-free. On top of it, optional layers
+demonstrate it against **mock backends** (the library itself stays pure):
+
+- **Mock data** (`agent_eval.mockdata`) — realistic questions, curated reference
+  paths, and candidate runs, served through two interchangeable mock backends:
+  a **SQL** one (stdlib `sqlite3`, in-memory) and a **NoSQL** one (in-memory
+  document store). Both implement the same `ReferenceBackend` interface.
+
+```bash
+# Headless CLI demo — load a mock DB, score every candidate run:
+uv run python -m agent_eval.demo --backend sql      # or: nosql
+uv run python -m agent_eval.demo --backend nosql --comparator lcs --aggregation mean
+```
+
+- **Web UI** (`ui/app.py`, Streamlit) — pick a backend, comparator, aggregation,
+  a question, and a candidate path; see the score and an explainable breakdown.
+
+```bash
+uv sync --extra ui
+uv run streamlit run ui/app.py
+```
+
+> The `mockdata` backends and the UI are **demo scaffolding** — they satisfy the
+> "show it against a SQL/NoSQL DB with a UI" request without violating the core
+> constraint that the *engine* keeps all state in memory with zero dependencies.
+
 ## Design docs
 
 `docs/spec.md` (problem + NFRs) · `docs/design.md` (interfaces, flow, edge cases) ·

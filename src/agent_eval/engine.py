@@ -59,6 +59,11 @@ class EvalEngine:
         """Return the stored reference paths for a question (empty if none)."""
         return self._store.traces(question_id)
 
+    def reference_items(self, question_id: str) -> list[tuple[int, Trace]]:
+        """Return ``(reference_id, trace)`` pairs so callers can map ids back to
+        :attr:`ScoreResult.breakdown` entries or to :meth:`remove_reference`."""
+        return self._store.snapshot(question_id)
+
     def remove_reference(self, question_id: str, reference_id: int) -> bool:
         """Remove one reference; ``True`` if it existed, else ``False``."""
         return self._store.remove(question_id, reference_id)
@@ -94,6 +99,7 @@ class EvalEngine:
             NoReferencesError: if the question exists but has no references.
             InvalidTraceError: if ``candidate`` is not a :class:`Trace`.
         """
+        self._require_question_id(question_id)
         self._require_trace(candidate)
         if not self._store.has_question(question_id):
             raise UnknownQuestionError(question_id)

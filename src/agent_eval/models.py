@@ -19,8 +19,24 @@ def _freeze_mapping(value: Mapping[str, Any]) -> Mapping[str, Any]:
     """Return an immutable, hashable view of a mapping (validates the type)."""
     if not isinstance(value, Mapping):
         raise InvalidTraceError(f"expected a mapping, got {type(value).__name__}")
-    # MappingProxyType blocks mutation; tuple-of-items gives a stable hash.
+    # MappingProxyType blocks mutation; to_hashable() gives a stable hash.
     return MappingProxyType(dict(value))
+
+
+def to_hashable(value: Any) -> Any:
+    """Recursively convert a value into a hashable, order-stable form.
+
+    Lets ``args``/``metadata`` hold nested ``list``/``dict``/``set`` values while
+    keeping :class:`Step`/:class:`Trace` hashable and comparable (see F1). Mapping
+    keys are assumed to be strings (validated at construction).
+    """
+    if isinstance(value, Mapping):
+        return tuple(sorted((k, to_hashable(v)) for k, v in value.items()))
+    if isinstance(value, (list, tuple)):
+        return tuple(to_hashable(v) for v in value)
+    if isinstance(value, (set, frozenset)):
+        return frozenset(to_hashable(v) for v in value)
+    return value
 
 
 @dataclass(frozen=True)
@@ -41,7 +57,7 @@ class Step:
         object.__setattr__(self, "args", _freeze_mapping(self.args))
 
     def __hash__(self) -> int:
-        return hash((self.tool, tuple(sorted(self.args.items()))))
+        return hash((self.tool, to_hashable(self.args)))
 
 
 @dataclass(frozen=True)
@@ -87,4 +103,4 @@ class Trace:
         return len(self.steps)
 
     def __hash__(self) -> int:
-        return hash((self.steps, tuple(sorted(self.metadata.items()))))
+        return hash((self.steps, to_hashable(self.metadata)))
