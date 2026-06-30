@@ -32,6 +32,7 @@ from .errors import (
     NoReferencesError,
     UnknownQuestionError,
 )
+from .explain import AlignOp, align, alignment_summary
 from .models import Step, Trace
 from .results import ReferenceScore, ScoreResult
 
@@ -42,8 +43,11 @@ __all__ = [
     "MEAN",
     "Aggregation",
     "AgentEvalError",
+    "AlignOp",
     "CompositeComparator",
     "EvalEngine",
+    "align",
+    "alignment_summary",
     "InvalidTraceError",
     "JaccardComparator",
     "LCSComparator",
